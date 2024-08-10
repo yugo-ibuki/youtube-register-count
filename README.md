@@ -1,3 +1,9 @@
+## setup
+```shell
+$ touch .env
+$ echo YOUTUBE_API_KEY=<YOUR_API_KEY> > .env
+````
+
 ## usage
 
 ```shell
