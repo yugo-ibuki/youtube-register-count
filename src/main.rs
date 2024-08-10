@@ -1,22 +1,30 @@
-use std::io::prelude::*;
-use std::net::TcpListener;
-use std::net::TcpStream;
+use actix_web::{get, web, App, HttpServer, Responder};
+use serde::Serialize;
 
-fn main() {
-    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
-
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
-        handle_connection(stream);
-    }
+#[derive(Serialize)]
+struct ApiResponse {
+    message: String,
+    status: String,
+    data: Vec<String>,
 }
 
-fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
-    stream.read(&mut buffer).unwrap();
+#[get("/")]
+async fn hello() -> impl Responder {
+    let response = ApiResponse {
+        message: "Hello, JSON API!".to_string(),
+        status: "success".to_string(),
+        data: vec!["item1".to_string(), "item2".to_string(), "item3".to_string()],
+    };
+    web::Json(response)
+}
 
-    let response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body>Hello, World!</body></html>";
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    println!("Server running at http://localhost:8080");
+    HttpServer::new(|| {
+        App::new().service(hello)
+    })
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
