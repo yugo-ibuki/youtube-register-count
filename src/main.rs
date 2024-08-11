@@ -44,6 +44,7 @@ async fn get_subscribers(channel_id: web::Path<String>) -> impl Responder {
     match reqwest::get(&url).await {
         Ok(response) => {
             if response.status().is_success() {
+                // 取得に成功したらレスポンスをパースする
                 match response.json::<YouTubeResponse>().await {
                     Ok(youtube_data) => {
                         println!("YouTube API Response: {:?}", youtube_data);
@@ -73,6 +74,7 @@ async fn get_subscribers(channel_id: web::Path<String>) -> impl Responder {
                     }),
                 }
             } else {
+                // エラーレスポンスを返す
                 web::Json(ApiResponse {
                     message: "YouTube API request failed".to_string(),
                     status: "error".to_string(),
